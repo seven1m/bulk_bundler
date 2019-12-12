@@ -1,3 +1,5 @@
+require 'thread'
+
 # The ThreadPool class below is Copyright © 2012, Kim Burgestrand kim@burgestrand.se
 # Licensed under X11 License
 # https://www.burgestrand.se/code/ruby-thread-pool/

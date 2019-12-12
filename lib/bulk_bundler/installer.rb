@@ -1,3 +1,6 @@
+require 'set'
+require 'thread'
+
 module BulkBundler
   class Installer
     def initialize(ruby_version:, lockfiles:, verbose: false)
@@ -80,15 +83,29 @@ module BulkBundler
     def install_needed_git_gems
       puts '> Checking out gems from git...'
       @pool.setup
+      @git_gem_paths = {}
+      semaphore = Mutex.new
       needed_git_gems.each do |name, data|
         url = data[:url]
         data[:set].each do |rev|
           @pool.schedule do
-            install_git_gem(name, url, rev)
+            path = install_git_gem(name, url, rev)
+            semaphore.synchronize do
+              @git_gem_paths[name] = path
+            end
           end
         end
       end
       @pool.shutdown
+      dir_was = Dir.pwd
+      @git_gem_paths.each do |name, path|
+        Dir.chdir(path)
+        gemspec_path = "#{path}/#{name}.gemspec"
+        gemspec_path = Dir["#{path}/*.gemspec"].first unless File.exist?(gemspec_path)
+        gemspec = Gem::StubSpecification.gemspec_stub(gemspec_path, path, git_gems_path).to_spec.to_ruby
+        File.write(gemspec_path, gemspec)
+      end
+      Dir.chdir(dir_was)
     end
 
     def install_git_gem(name, url, rev)
@@ -99,13 +116,7 @@ module BulkBundler
       command = "mkdir -p #{git_gems_path} && git clone #{url} #{path} 2>&1; cd #{path} && git fetch origin && git reset --hard #{rev} 2>&1"
       puts command if verbose?
       sh(command)
-      dir_was = Dir.pwd
-      Dir.chdir(path)
-      gemspec_path = "#{path}/#{name}.gemspec"
-      gemspec_path = Dir["#{path}/*.gemspec"].first unless File.exist?(gemspec_path)
-      gemspec = Gem::StubSpecification.gemspec_stub(gemspec_path, path, git_gems_path).to_spec.to_ruby
-      File.write(gemspec_path, gemspec)
-      Dir.chdir(dir_was)
+      path
     end
 
     def needed_git_gems

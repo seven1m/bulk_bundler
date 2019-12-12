@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'pp'
-require 'set'
-require 'thread'
 require 'bulk_bundler'
 
 if ARGV.any?

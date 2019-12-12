@@ -22,7 +22,7 @@ module BulkBundler
 
     def gem(name, *args)
       options = args.last.is_a?(Hash) ? args.last : {}
-      return if options[:git]
+      return if options[:git] || options[:path]
       @gems[@current_source] ||= []
       @gems[@current_source] << name
     end
