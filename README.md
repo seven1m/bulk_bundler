@@ -13,7 +13,7 @@ My sins include:
 - using threads as if I know how to do that safely
 - assuming you are using [rbenv](https://github.com/rbenv/rbenv)
 
-And I'm sure there more!
+And I'm sure there are more!
 
 ## Installation
 
