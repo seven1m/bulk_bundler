@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require 'pp'
+require 'set'
+require 'thread'
+require 'bulk_bundler'
+
+if ARGV.any?
+  lockfiles_by_ruby_version = {}
+  ARGV.each do |lockfile_path|
+    ruby_version_file = File.join(File.split(lockfile_path).first, '.ruby-version')
+    ruby_version = File.read(ruby_version_file).strip
+    lockfiles_by_ruby_version[ruby_version] ||= []
+    lockfiles_by_ruby_version[ruby_version] << lockfile_path
+  end
+
+  lockfiles_by_ruby_version.each do |ruby_version, lockfiles|
+    puts "Installing gems for Ruby #{ruby_version}..."
+    BulkBundler::Installer.new(ruby_version: ruby_version, lockfiles: lockfiles, verbose: ENV['VERBOSE']).go!
+  end
+else
+  puts 'You must supply one or more Gemfile.lock files.'
+  exit 1
+end
