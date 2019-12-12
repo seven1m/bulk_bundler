@@ -10,6 +10,7 @@ My sins include:
 - running the `Gemfile` through a bespoke loader I made without almost no knowledge of how Gemfiles are supposed to be loaded
 - shelling out to the `gem` command with all variety of command line arguments I may or may not have read about in the man page
 - reaching in and cloning repos inside Bundler's special gem directory
+- using threads as if I know how to do that safely
 - assuming you are using [rbenv](https://github.com/rbenv/rbenv)
 
 And I'm sure there more!

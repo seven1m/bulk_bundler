@@ -83,9 +83,9 @@ module BulkBundler
       needed_git_gems.each do |name, data|
         url = data[:url]
         data[:set].each do |rev|
-          #@pool.schedule do
+          @pool.schedule do
             install_git_gem(name, url, rev)
-          #end
+          end
         end
       end
       @pool.shutdown
